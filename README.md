@@ -1,4 +1,4 @@
-# CS470-final-project
+# CS570-final-project
 Exploring Spark
 ## 1 Introduction
 Apache Spark™ is a unified analytics engine for large-scale data processing.  
