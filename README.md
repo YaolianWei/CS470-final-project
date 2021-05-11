@@ -56,6 +56,23 @@ From references paper[1], we can know some conclusions:
 | Spark |Spark is a parallel computing framework based on in-memory computing. It is suitable for applications that require multiple rounds of iterative computation.|
 | MPI |MPI is a parallel computing framework based on message passing. It is suitable for parallel computing of various complex applications and supports MPMD(multi-program multi-data).|
 
+### 1.3 Applications
+**Pregel:** Graph processing framework from Google that implements Bulk Synchronous Parallel model.
+- Vertices in the graph have state
+- At each superstep, each node can update its state and send messages to nodes in future step
+
+**Pregel in Spark:**
+- Separate RDDs for immutable graph state and for vertex states and messages at each iteration
+- Use groupByKey to perform each step
+- Cache the resulting vertex and message RDDs
+- Optimization: co-partition input graph and vertex state RDDs to reduce communication
+
+**Other Spark Applications:**  
+• Twitter spam classification  
+• EM alg. for traffic prediction (Mobile Millennium)  
+• K-means clustering  
+• Alternating Least Squares matrix factorization  
+• In-memory OLAP aggregation on Hive data  
 
 ## 2 Installation
 ### 2.1 JDK Installation
@@ -81,6 +98,7 @@ After IDEA installation is complete, install the Scala plugin:
 start IntelJ, Click on the Configuration -> Plugins, or file->setting->Plugins; search for Scala and install the plugin.  
 
 ## 3 Hello World
+
 Study link: https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html
 
 ## 4 An example-Pi
@@ -93,6 +111,7 @@ The following figure shows I set * in local[]:
 ![setThreads](https://user-images.githubusercontent.com/78562542/117887225-f5bba300-b2e2-11eb-9132-58c66fd92270.png)
 
 ### 4.2 Scala Spark Pi
+
 ![Pi](https://user-images.githubusercontent.com/78562542/117887787-d07b6480-b2e3-11eb-8c50-4dc66e359cd2.png)
 
 
