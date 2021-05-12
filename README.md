@@ -43,8 +43,13 @@ GraphX is the Spark API for graphs and graph-parallel computation. Thus, it exte
 MLlib stands for Machine Learning Library. Spark MLlib is used to perform machine learning in Apache Spark.
 
 ##### 1.1.3.2 Spark Architecture
-![Spark Architecture](https://user-images.githubusercontent.com/78562542/117964929-cd6c8c80-b354-11eb-872b-b121bb0766c1.png)  
-
+Spark applications run as independent sets of processes on a cluster, coordinated by the SparkContext object in your main program (called the _driver program_).  
+Specifically, to run on a cluster, the SparkContext can connect to several types of _cluster managers_ (either Spark’s own standalone cluster manager, Mesos or YARN), which allocate resources across applications. Once connected, Spark acquires _executors_ on nodes in the cluster, which are processes that run computations and store data for your application. Next, it sends your application code (defined by JAR or Python files passed to SparkContext) to the executors. Finally, SparkContext sends _tasks_ to the executors to run.  
+![Spark Architecture](https://user-images.githubusercontent.com/78562542/117993394-48906b80-b372-11eb-8bd9-0a63065acbd8.png)  
+- **Driver**
+The Spark driver node is used to execute the main method in the Spark task and is responsible for the execution of the actual code.
+- **Executor**
+Spark Executor is a JVM process in the worker node (Worker) in the cluster, responsible for running specific tasks (Task) in the Spark job, and the tasks are independent of each other. When the Spark application starts, the Executor node is started at the same time, and it always exists with the life cycle of the entire Spark application. If an Executor node fails or crashes, the Spark application can continue to execute, and the task on the error node will be scheduled to other Executor nodes to continue running.
 
 #### 1.1.4 RDD
 At a high level, every Spark application consists of a _driver program_ that runs the user’s main function and executes various _parallel operations_ on a cluster. The main abstraction Spark provides is a _resilient distributed dataset (RDD)_, which is a collection of elements partitioned across the nodes of the cluster that can be operated on in parallel. RDDs are created by starting with a file in the Hadoop file system (or any other Hadoop-supported file system), or an existing Scala collection in the driver program, and transforming it. Users may also ask Spark to _persist_ an RDD in memory, allowing it to be reused efficiently across parallel operations. Finally, RDDs automatically recover from node failures.  
@@ -132,20 +137,54 @@ Add to PATH：`%HADOOP_HOME%\bin`
 ### 3.1 Hello World Test
 Study link: https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html
 
-### 3.2 Pi Test
-#### 3.2.1 Java Spark Pi
-I tried to execute the JavaSparkPi code in local stand-alone mode. In this mode, all Spark processes run in the same JVM, and parallel processing is done by multi-threading. By default, this code will enable the same number of threads as the local system's CPU cores.  
+### 3.2 Run Example sparkPi
+#### 3.2.1 JavaSparkPi/SparkPi - run in development environment
+In the learning process, we can run the code directly in the development environment.  
 The output is shown in the figure:
 ![JavaSparkPi](https://user-images.githubusercontent.com/78562542/117886546-f3a51480-b2e1-11eb-873a-e8d9356e03e6.png)
-We can set the level of parallelism in local mode, specify a master variables in the format local[N]. The N in the above argument indicates the number of threads to use.  
+![Pi](https://user-images.githubusercontent.com/78562542/117992337-6e694080-b371-11eb-8c93-abaabada94ae.png)
+
+
 The following figure shows that I set * in local[]:
 ![setThreads](https://user-images.githubusercontent.com/78562542/117887225-f5bba300-b2e2-11eb-9132-58c66fd92270.png)
 
-#### 3.2.2 Scala Spark Pi
-![Pi](https://user-images.githubusercontent.com/78562542/117887787-d07b6480-b2e3-11eb-8c50-4dc66e359cd2.png)
+#### 3.2.2 Spark Pi - run in local environment
+I tried to execute the SparkPi example in local stand-alone mode. In this mode, all Spark processes run in the same JVM, and parallel processing is done by multi-threading. By default, this code will enable the same number of threads as the local system's CPU cores.  
+cmd input: `run-example SparkPi`  
+![SparkPi](https://user-images.githubusercontent.com/78562542/117991302-8096af00-b370-11eb-8c43-0de5002cd576.png)
+
+We can set the level of parallelism in local mode, specify a master variables in the format local[N]. The N in the above argument indicates the number of threads to use.  
 
 ## 4 An example-WordCount
+In order to intuitively feel the effects of the Spark framework, I implemented WordCount-one of the most common examples in a big data subject.  
+```
+// Create Spark Run Configuration Object
+val sparConf = new SparkConf().setMaster("local").setAppName("WordCount")
 
+// Create Spark context environment object (connection object)
+val sc = new SparkContext(sparConf)
+
+// Read the file
+val lines: RDD[String] = sc.textFile("word.txt")
+
+// Split a row of data to form word by word (word segmentation)
+val words: RDD[String] = lines.flatMap(_.split(" "))
+
+// Convert data structure word => (word, 1)
+val wordToOne: RDD[(String, Int)] = words.map(=>(_,1))
+
+// The data after the conversion is grouped and aggregated according to the same words
+val wordToCount: RDD[(String, Int)] = wordToOne.reduceByKey(_+_)
+
+// Collect the conversion result to the console 
+val array: Array[(String, Int)] = wordToCount.collect()
+
+// Print the result
+array.foreach(println)
+
+// Close the connection
+sc.stop()
+```
 
 ### References
 [1]Jorge L. Reyes-Ortiz, Luca Oneto, Davide Anguita,Big Data Analytics in the Cloud: Spark on Hadoop vs MPI/OpenMP on Beowulf,Procedia Computer Science,
