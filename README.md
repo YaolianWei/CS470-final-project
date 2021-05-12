@@ -29,7 +29,24 @@ Spark makes working sets a first-class concept to efficiently support these apps
  
 **Solution:** augment data flow model with “resilient distributed dataset” (RDD).
 
-#### 1.1.3 RDD
+#### 1.1.3 Spark Ecosystem and Architecture
+##### 1.1.3.1 Spark Ecosystem
+- **Spark Core**  
+Spark Core is the base engine for large-scale parallel and distributed data processing. Further, additional libraries which are built on the top of the core allows diverse workloads for streaming, SQL, and machine learning. It is responsible for memory management and fault recovery, scheduling, distributing and monitoring jobs on a cluster & interacting with storage systems.
+- **Spark Streaming**  
+Spark Streaming is the component of Spark which is used to process real-time streaming data. Thus, it is a useful addition to the core Spark API. It enables high-throughput and fault-tolerant stream processing of live data streams.
+- **Spark SQL**  
+Spark SQL is a new module in Spark which integrates relational processing with Spark’s functional programming API. It supports querying data either via SQL or via the Hive Query Language. For those of you familiar with RDBMS, Spark SQL will be an easy transition from your earlier tools where you can extend the boundaries of traditional relational data processing.
+- **GraphX**  
+GraphX is the Spark API for graphs and graph-parallel computation. Thus, it extends the Spark RDD with a Resilient Distributed Property Graph. At a high-level, GraphX extends the Spark RDD abstraction by introducing the Resilient Distributed Property Graph (a directed multigraph with properties attached to each vertex and edge).
+- **MLlib (Machine Learning)**  
+MLlib stands for Machine Learning Library. Spark MLlib is used to perform machine learning in Apache Spark.
+
+##### 1.1.3.2 Spark Architecture
+![Spark Architecture](https://user-images.githubusercontent.com/78562542/117964929-cd6c8c80-b354-11eb-872b-b121bb0766c1.png)  
+
+
+#### 1.1.4 RDD
 At a high level, every Spark application consists of a _driver program_ that runs the user’s main function and executes various _parallel operations_ on a cluster. The main abstraction Spark provides is a _resilient distributed dataset (RDD)_, which is a collection of elements partitioned across the nodes of the cluster that can be operated on in parallel. RDDs are created by starting with a file in the Hadoop file system (or any other Hadoop-supported file system), or an existing Scala collection in the driver program, and transforming it. Users may also ask Spark to _persist_ an RDD in memory, allowing it to be reused efficiently across parallel operations. Finally, RDDs automatically recover from node failures.  
 A second abstraction in Spark is shared _variables_ that can be used in parallel operations. By default, when Spark runs a function in parallel as a set of tasks on different nodes, it ships a copy of each variable used in the function to each task. Sometimes, a variable needs to be shared across tasks, or between tasks and the driver program. Spark supports two types of shared variables: _broadcast variables_, which can be used to cache a value in memory on all nodes, and _accumulators_, which are variables that are only “added” to, such as counters and sums. 
   
@@ -76,7 +93,7 @@ From references paper[1], we can know some conclusions:
 • Alternating Least Squares matrix factorization  
 • In-memory OLAP aggregation on Hive data  
 
-## 2 Installation
+## 2 Windoews Installation
 ### 2.1 Base Installation
 Before installing the tool, we need to configure the Java environment. And My Java version is that:  
 cmd input: `java -version`  
@@ -112,11 +129,11 @@ Establish SPARK_HOME：`D:\hadoop-2.7.7`
 Add to PATH：`%HADOOP_HOME%\bin`
 
 ## 3 Hello World
-
+### 3.1 Hello World Test
 Study link: https://docs.scala-lang.org/getting-started/intellij-track/getting-started-with-scala-in-intellij.html
 
-## 4 An example-Pi
-### 4.1 Java Spark Pi
+### 3.2 Pi Test
+#### 3.2.1 Java Spark Pi
 I tried to execute the JavaSparkPi code in local stand-alone mode. In this mode, all Spark processes run in the same JVM, and parallel processing is done by multi-threading. By default, this code will enable the same number of threads as the local system's CPU cores.  
 The output is shown in the figure:
 ![JavaSparkPi](https://user-images.githubusercontent.com/78562542/117886546-f3a51480-b2e1-11eb-873a-e8d9356e03e6.png)
@@ -124,10 +141,10 @@ We can set the level of parallelism in local mode, specify a master variables in
 The following figure shows that I set * in local[]:
 ![setThreads](https://user-images.githubusercontent.com/78562542/117887225-f5bba300-b2e2-11eb-9132-58c66fd92270.png)
 
-### 4.2 Scala Spark Pi
-
+#### 3.2.2 Scala Spark Pi
 ![Pi](https://user-images.githubusercontent.com/78562542/117887787-d07b6480-b2e3-11eb-8c50-4dc66e359cd2.png)
 
+## 4 An example-WordCount
 
 
 ### References
