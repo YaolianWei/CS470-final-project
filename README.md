@@ -29,8 +29,11 @@ Spark makes working sets a first-class concept to efficiently support these apps
  
 **Solution:** augment data flow model with “resilient distributed dataset” (RDD).
 
-#### 1.1.3 Spark Ecosystem and Architecture
-##### 1.1.3.1 Spark Ecosystem
+
+#### 1.1.3 Spark Ecosystem
+Spark has obvious advantage in big data processing, it has been used by many researchers and industrial practitioners worldwide and has become the top project of Apache[1]. In recent years, the ecosystem of Spark has been gradually improved and is fully functional, and the Spark ecosystem has many components, as shown in the following figure.
+![SparkEcosystem](https://user-images.githubusercontent.com/78562542/117997925-01a47500-b376-11eb-93b2-3097e0390ec2.png)
+
 - **Spark Core**  
 Spark Core is the base engine for large-scale parallel and distributed data processing. Further, additional libraries which are built on the top of the core allows diverse workloads for streaming, SQL, and machine learning. It is responsible for memory management and fault recovery, scheduling, distributing and monitoring jobs on a cluster & interacting with storage systems.
 - **Spark Streaming**  
@@ -42,7 +45,7 @@ GraphX is the Spark API for graphs and graph-parallel computation. Thus, it exte
 - **MLlib (Machine Learning)**  
 MLlib stands for Machine Learning Library. Spark MLlib is used to perform machine learning in Apache Spark.
 
-##### 1.1.3.2 Spark Architecture
+#### 1.1.4 Spark Architecture
 Spark applications run as independent sets of processes on a cluster, coordinated by the SparkContext object in your main program (called the _driver program_).  
 Specifically, to run on a cluster, the SparkContext can connect to several types of _cluster managers_ (either Spark’s own standalone cluster manager, Mesos or YARN), which allocate resources across applications. Once connected, Spark acquires _executors_ on nodes in the cluster, which are processes that run computations and store data for your application. Next, it sends your application code (defined by JAR or Python files passed to SparkContext) to the executors. Finally, SparkContext sends _tasks_ to the executors to run.  
 ![Spark Architecture](https://user-images.githubusercontent.com/78562542/117993394-48906b80-b372-11eb-8bd9-0a63065acbd8.png)  
@@ -51,7 +54,7 @@ The Spark driver node is used to execute the main method in the Spark task and i
 - **Executor**
 Spark Executor is a JVM process in the worker node (Worker) in the cluster, responsible for running specific tasks (Task) in the Spark job, and the tasks are independent of each other. When the Spark application starts, the Executor node is started at the same time, and it always exists with the life cycle of the entire Spark application. If an Executor node fails or crashes, the Spark application can continue to execute, and the task on the error node will be scheduled to other Executor nodes to continue running.
 
-#### 1.1.4 RDD
+#### 1.1.5 RDD
 At a high level, every Spark application consists of a _driver program_ that runs the user’s main function and executes various _parallel operations_ on a cluster. The main abstraction Spark provides is a _resilient distributed dataset (RDD)_, which is a collection of elements partitioned across the nodes of the cluster that can be operated on in parallel. RDDs are created by starting with a file in the Hadoop file system (or any other Hadoop-supported file system), or an existing Scala collection in the driver program, and transforming it. Users may also ask Spark to _persist_ an RDD in memory, allowing it to be reused efficiently across parallel operations. Finally, RDDs automatically recover from node failures.  
 A second abstraction in Spark is shared _variables_ that can be used in parallel operations. By default, when Spark runs a function in parallel as a set of tasks on different nodes, it ships a copy of each variable used in the function to each task. Sometimes, a variable needs to be shared across tasks, or between tasks and the driver program. Spark supports two types of shared variables: _broadcast variables_, which can be used to cache a value in memory on all nodes, and _accumulators_, which are variables that are only “added” to, such as counters and sums. 
   
@@ -67,7 +70,7 @@ Spark revolves around the concept of a _resilient distributed dataset (RDD)_, wh
 ### 1.2 Compare Spark to MPI and OpenMP
 Message Passing Interface(MPI) is a language-independent communications protocol for parallel computing where point-to-point and collective communication are supported. MPI goalsare high performance, scalability, and portability. MPI is currently the dominant model used inhigh-performance computing and is ade factocommunication standard that provides portability among parallel programs running on distributed memory systems. However, the standarddoes not currently support fault tolerance since it mainly addresses High-Performance Com-puting(HPC) problems. Another MPI drawback is that it is not suitable for small grain level ofparallelism, for example, to exploit the parallelism of multi-core platforms for shared memorymultiprocessing.   
 OpenMP, on the other hand, is an Application Programming Interface(API) that supports multi-platform shared memory multiprocessing programming on mostprocessor architectures and operating systems. OpenMP is becoming the standard for sharedmemory parallel programming for its high performance, but unfortunately, it is not suitablefor distributed memory systems. The idea of extending this API to cope with this issue isnow a growing field of research. OpenMP’s user-friendly interface allows to easily parallelizecomplex algorithms. The same thing cannot be said about MPI since the code must be heav-ily re-engineered in order to obtain relevant performance improvements.  
-From references paper[1], we can know some conclusions:
+From references paper[2], we can know some conclusions:
 - From a computational point of view, the MPI/OpenMP implementation is much more powerful than the Spark on Hadoop alternative in terms of speed.
 - MPI/OpenMP scales better than Spark. This is mainly to its low level programming languageand reduced overhead (e.g. no fault handling such as in Spark). The speedup of MPI/OpenMP over Spark is due to the dataset size with respect to the cluster size. Witha larger dataset, time differences between the two implementations would be smaller. This is explained due to an increase of the effective computation time (e.g. classification) with respect to the overhead of the technologies.
 - For what concerns to data I/O management, MPI/OpenMP and Spark are much closer in terms of disk access time although MPI/OpenMP is still faster. Moreover, Spark on Hadoop is better suited to exploit the GCP infrastructure since it is able to split the data inmultiple chunks so files can be read in parallel from many sectors. This is because in GCP,virtual disks can spread over multiple physical disks so to improve the I/O performance. Our MPI/OpenMP implementation does not currently exploit this possibility.  
@@ -187,5 +190,5 @@ sc.stop()
 ```
 
 ### References
-[1]Jorge L. Reyes-Ortiz, Luca Oneto, Davide Anguita,Big Data Analytics in the Cloud: Spark on Hadoop vs MPI/OpenMP on Beowulf,Procedia Computer Science,
-Volume 53,2015,Pages 121-130,ISSN 1877-0509,https://doi.org/10.1016/j.procs.2015.07.286.
+[1]Xiaoling Tao, Yang Peng, Feng Zhao, Peichao Zhao and Yong Wang,A parallel algorithm for network traffic anomaly detection based on Isolation Forest,vol.14,2018, doi:10.1177/1550147718814471  
+[2]Jorge L. Reyes-Ortiz, Luca Oneto, Davide Anguita,Big Data Analytics in the Cloud: Spark on Hadoop vs MPI/OpenMP on Beowulf,Procedia Computer Science,Volume 53,2015,Pages 121-130,ISSN 1877-0509,https://doi.org/10.1016/j.procs.2015.07.286.
