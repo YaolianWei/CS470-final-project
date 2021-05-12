@@ -3,7 +3,7 @@ package wordcount
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
-object WordCount02 {
+object WordCount01 {
   def main(args: Array[String]): Unit = {
 
     // TODO Establish a connection with the Spark framework
@@ -11,31 +11,35 @@ object WordCount02 {
     val sparConf = new SparkConf().setMaster("local").setAppName("WordCount")
     val sc = new SparkContext(sparConf)
 
-    // TODO 执行业务操作
+    // TODO Perform operations
 
     // 1. Read the file, get the data line by line
     //    hello world
-    val lines: RDD[String] = sc.textFile("Test/data")
+    val lines: RDD[String] = sc.textFile("TutorialExample/data")
 
     // 2. Split a row of data to form word by word (word segmentation)
     //    Flattening: the operation of splitting the whole into individual
     //   "hello world" => hello, world, hello, world
     val words: RDD[String] = lines.flatMap(_.split(" "))
 
-    // 3. Convert the word structure to facilitate statistics
-    //    word => (word, 1)
-    val wordToOne = words.map(word=>(word,1))
+    // 3. Group data according to words for easy statistics
+    //    (hello, hello, hello), (world, world)
+    val wordGroup: RDD[(String, Iterable[String])] = words.groupBy(word=>word)
 
-    // 4. Group and aggregate the converted data
-    //    reduceByKey: The value of the same key is aggregated
-    // (word, 1) => (word, sum)
-    val wordToSum: RDD[(String, Int)] = wordToOne.reduceByKey(_+_)
+    // 4. Convert the grouped data
+    //    (hello, hello, hello), (world, world)
+    //    (hello, 3), (world, 2)
+    val wordToCount = wordGroup.map {
+      case ( word, list ) => {
+        (word, list.size)
+      }
+    }
 
     // 5. Collect the conversion result to the console and print it out
-    val array: Array[(String, Int)] = wordToSum.collect()
+    val array: Array[(String, Int)] = wordToCount.collect()
     array.foreach(println)
 
-    // TODO 关闭连接
+    // TODO Close the connection
     sc.stop()
   }
 }
